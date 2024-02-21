@@ -10,8 +10,4 @@ app.get("*", (request, response) => {
   return response.status(404).json({ message: "Sorry. Page not found" });
 });
 
-app.listen(port, () => {
-  console.log(`Server is listening at http://localhost:${port}`);
-});
-
-module.exports = app
+module.exports = app;
