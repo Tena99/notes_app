@@ -1,7 +1,9 @@
 let express = require("express");
 let app = express();
-
+const cors = require("cors");
 let postgres = require("@vercel/postgres");
+
+app.use(cors());
 
 app.get("/", async (request, response) => {
   createTables();
@@ -33,6 +35,19 @@ app.get("/:user/:noteID", async (request, response) => {
 
 app.get("*", (request, response) => {
   return response.status(404).json({ message: "Sorry. Page not found" });
+});
+
+app.post("/", async (request, response) => {
+  createTables();
+
+  const { content } = request.body;
+
+  if (content) {
+    await postgres.sql`INSERT INTO notes (content) VALUES (${content})`;
+    response.json({ message: "Successfully created note." });
+  } else {
+    response.json({ error: "Note NOT created. Content is missing." });
+  }
 });
 
 async function createTables() {
