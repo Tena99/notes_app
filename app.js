@@ -12,6 +12,13 @@ app.get("/", async (request, response) => {
   return response.json(rows);
 });
 
+app.get("/users", async (request, response) => {
+  createTables();
+  const { rows } = await postgres.sql`SELECT * FROM users`;
+
+  return response.json(rows);
+});
+
 app.get("/:user", async (request, response) => {
   createTables();
   const { user } = request.params;
@@ -29,13 +36,6 @@ app.get("/:user/:noteID", async (request, response) => {
 
   const { rows } =
     await postgres.sql`SELECT DISTINCT notes.id, notes.content, notes."userID", users.name FROM notes INNER JOIN users on notes."userID" = users.id WHERE notes.id = ${noteID} AND users.name = ${user}`;
-
-  return response.json(rows);
-});
-
-app.get("/users", async (request, response) => {
-  createTables();
-  const { rows } = await postgres.sql`SELECT * FROM users`;
 
   return response.json(rows);
 });
