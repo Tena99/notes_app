@@ -33,6 +33,13 @@ app.get("/:user/:noteID", async (request, response) => {
   return response.json(rows);
 });
 
+app.get("/users", async (request, response) => {
+  createTables();
+  const { rows } = await postgres.sql`SELECT * FROM users`;
+
+  return response.json(rows);
+});
+
 app.get("*", (request, response) => {
   return response.status(404).json({ message: "Sorry. Page not found" });
 });
