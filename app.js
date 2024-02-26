@@ -17,7 +17,7 @@ app.get("/:user", async (request, response) => {
   const { user } = request.params;
 
   const { rows } =
-    await postgres.sql`SELECT * FROM notes INNER JOIN users ON notes."userID" = users.id WHERE users.name = ${user}`;
+    await postgres.sql`SELECT DISTINCT notes.id, notes.content, notes."userID", users.name FROM notes INNER JOIN users ON notes."userID" = users.id WHERE users.name = ${user}`;
 
   return response.json(rows);
 });
@@ -28,7 +28,7 @@ app.get("/:user/:noteID", async (request, response) => {
   const { user, noteID } = request.params;
 
   const { rows } =
-    await postgres.sql`SELECT * FROM notes INNER JOIN users on notes."userID" = users.id WHERE notes.id = ${noteID} AND users.name = ${user}`;
+    await postgres.sql`SELECT DISTINCT notes.id, notes.content, notes."userID", users.name FROM notes INNER JOIN users on notes."userID" = users.id WHERE notes.id = ${noteID} AND users.name = ${user}`;
 
   return response.json(rows);
 });
@@ -40,13 +40,14 @@ app.get("*", (request, response) => {
 app.post("/", async (request, response) => {
   createTables();
 
+  const { userID } = request.body;
   const { content } = request.body;
 
   if (content) {
-    await postgres.sql`INSERT INTO notes (content) VALUES (${content})`;
+    await postgres.sql`INSERT INTO notes (content, "userID") VALUES (${content} ${userID})`;
     response.json({ message: "Successfully created note." });
   } else {
-    response.json({ error: "Note NOT created. Content is missing." });
+    response.json({ error: "Note NOT created. Content or userID is missing." });
   }
 });
 
